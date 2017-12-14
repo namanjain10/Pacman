@@ -24,6 +24,7 @@ var arr = [
 [0,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,1,0,1,1,0,1,1,1,1,0,1,1,1,1,1,1,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]];
 
+var x = 0;
 var pos_x = 23;
 var pos_y = 18;
 
@@ -70,6 +71,7 @@ function init () {
                 var y = 25*j;
                 document.getElementById('dot' +(i.toString()) + '_' +j.toString()).style.left = y.toString() + "px";
                 document.getElementById('dot' +(i.toString()) + '_' +j.toString()).style.top = x.toString() + "px";
+                document.getElementById('dot' +(i.toString()) + '_' +j.toString()).style.display = "block";
             }
         }
     }
@@ -169,7 +171,7 @@ function init () {
     document.getElementById("pacman_closed").style.top = (pos_x*25) + 'px';
     document.getElementById("pacman_closed").style.display = "none";
 
-    //setInterval (frame_down,75);
+    moveLeft();
 }
 
 function frame_up () {
@@ -210,30 +212,62 @@ function frame_right () {
 
     id.style.left = (parseInt(id.style.left) + 5) + 'px' ;
     id1.style.left = (parseInt(id1.style.left) + 5) + 'px' ;
+
+}
+
+function setIntervalX(callback, delay, repetitions) {
+    var x = 0;
+    var intervalID = window.setInterval(function () {
+
+       callback();
+
+       if (++x === repetitions) {
+           window.clearInterval(intervalID);
+           hide();
+       }
+    }, delay);
 }
 
 function moveRight () {
-        if (arr[pos_x][pos_y] == 0 || arr[pos_x][pos_y] == -1) {
-            pos_y++;
-            frame_right                    // perform with setTimeout(moveright,375)
-        }
+    if (arr[pos_x][pos_y+1] == 0 || arr[pos_x][pos_y+1] == -1) {
+        pos_y++;
+        setIntervalX(function () {
+            frame_right();
+        }, 75, 5);                    // perform with setTimeout(moveright,375)
+    }
 }
 
 function moveLeft() {
-    if (arr[pos_x][pos_y] == 0 || arr[pos_x][pos_y] == -1) {
+    if (arr[pos_x][pos_y-1] == 0 || arr[pos_x][pos_y-1] == -1) {
         pos_y--;
+        setIntervalX(function () {
+            frame_left();
+        }, 75, 5);
+    }
+}
+
+function hide () {
+    if (document.getElementById('dot' +(pos_x.toString()) + '_' +pos_y.toString()).style.display == "block") {
+        document.getElementById('dot' +(pos_x.toString()) + '_' +pos_y.toString()).style.display = "none";
     }
 }
 
 function moveUp() {
-    if (arr[pos_x][pos_y] == 0 || arr[pos_x][pos_y] == -1) {
+    if (arr[pos_x-1][pos_y] == 0 || arr[pos_x-1][pos_y] == -1) {
         pos_x--;
+        setIntervalX(function () {
+            frame_up();
+        }, 75, 5);
     }
 }
 
 function moveDown() {
-    if (arr[pos_x][pos_y] == 0 || arr[pos_x][pos_y] == -1) {
+    if (arr[pos_x+1][pos_y] == 0 || arr[pos_x+1][pos_y] == -1) {
         pos_x++;
+
+        setIntervalX(function () {
+            frame_down();
+        }, 75, 5);
     }
 }
 
@@ -242,24 +276,21 @@ window.onload = init;
 function mark(e){
     switch(e.key) {
         case "ArrowRight" :
-
-            //document.getElementById("pacman_open").style.left = (parseInt(document.getElementById("pacman_open").offsetLeft) + 25).toString()+"px";
+            moveRight();
             break;
 
         case "ArrowLeft" :
-            frame_left();
-            //document.getElementById("pacman_open").style.left = (parseInt(document.getElementById("pacman_open").offsetLeft) - 25).toString()+"px";
+            moveLeft();
             break;
 
         case "ArrowUp" :
-
-            //document.getElementById("pacman_open").style.top = (parseInt(document.getElementById("pacman_open").offsetTop) - 25).toString()+"px";
+            moveUp();
             break;
 
         case "ArrowDown" :
-            //setInterval (frame_down,15);
-            //document.getElementById("pacman_open").style.top = (parseInt(document.getElementById("pacman_open").offsetTop) + 25).toString()+"px";
+            moveDown();
             break;
+
         default :
             console.log(e);
     }
